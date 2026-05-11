@@ -1,0 +1,181 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "availabilitySlots",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "professorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "phase",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "startAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "reservations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "studentNo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "professorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "phase",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "reservations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "professorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "startAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "alternateRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "professorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "openCounselRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "professorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "alternateRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "studentNo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "professorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "phase",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "openCounselRequests",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "studentNo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "professorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "reservations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "studentNo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "startAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "reservations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "professorId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "studentNo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "startAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "reservations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "startAt",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

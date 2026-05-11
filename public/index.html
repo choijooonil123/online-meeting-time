@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>원격수업 학생 상담관리 시스템</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=SUIT:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Online Meeting Time</p>
+          <h1>원격수업 학생 상담관리 시스템</h1>
+          <p class="hero-text">여러 지도교수가 상담 가능 시간을 10분 단위로 공개하고, 학생 신청과 교수 승인으로 전화면담을 운영합니다.</p>
+        </div>
+        <div class="hero-aside">
+          <div class="badge-card">
+            <span class="badge-label">상담 운영 구간</span>
+            <strong id="semesterLabel">2026학년도 1학기</strong>
+            <p id="semesterPeriod">학기 일정 로딩 중</p>
+          </div>
+          <div class="badge-card accent">
+            <span class="badge-label">안내</span>
+            <p id="supportMessage">예약 확정 시 문자 알림이 발송됩니다.</p>
+          </div>
+        </div>
+      </header>
+
+      <main class="grid">
+        <section class="panel panel-wide">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">학생 예약</p>
+              <h2>전화면담 가능 시간 선택</h2>
+            </div>
+            <div class="phase-legend">
+              <button class="phase-chip active" type="button" data-phase-filter="all">전체</button>
+              <button class="phase-chip" type="button" data-phase-filter="1">1차 면담</button>
+              <button class="phase-chip" type="button" data-phase-filter="2">2차 면담</button>
+            </div>
+          </div>
+
+          <label>
+            <span>지도교수 선택</span>
+            <select id="publicProfessorSelect"></select>
+          </label>
+
+          <div id="slotSummary" class="summary-row"></div>
+          <div id="slotList" class="slot-list"></div>
+
+          <form id="bookingForm" class="booking-form">
+            <div class="form-title-row">
+              <div>
+                <p class="section-kicker">예약 신청</p>
+                <h3>선택한 시간</h3>
+              </div>
+              <strong id="selectedSlotLabel">상담 시간을 선택하세요.</strong>
+            </div>
+            <input type="hidden" id="selectedSlotId">
+            <div class="field-grid">
+              <label>
+                <span>이름</span>
+                <input id="studentName" name="studentName" type="text" placeholder="홍길동" required>
+              </label>
+              <label>
+                <span>학번</span>
+                <input id="studentNo" name="studentNo" type="text" placeholder="20260001" required>
+              </label>
+              <label>
+                <span>지도교수</span>
+                <select id="bookingProfessorId" required></select>
+              </label>
+              <label>
+                <span>휴대폰 번호</span>
+                <input id="studentPhone" name="studentPhone" type="tel" placeholder="010-1234-5678" required>
+              </label>
+              <label>
+                <span>휴대폰 뒷자리</span>
+                <input id="studentPhoneLast4" name="studentPhoneLast4" type="text" maxlength="4" placeholder="5678" readonly>
+              </label>
+            </div>
+            <label>
+              <span>상담 메모</span>
+              <textarea id="studentNote" name="studentNote" rows="3" placeholder="상담 시 참고할 내용을 적어주세요."></textarea>
+            </label>
+            <button class="primary-btn" type="submit">예약 신청</button>
+            <div id="bookingMessage" class="inline-message"></div>
+          </form>
+
+          <form id="alternateRequestForm" class="booking-form alternate-form">
+            <div class="form-title-row">
+              <div>
+                <p class="section-kicker">대체 면담 요청</p>
+                <h3>예약 가능한 시간이 모두 어려운 경우</h3>
+              </div>
+              <strong>가능한 시간대를 남겨주세요.</strong>
+            </div>
+            <div class="field-grid">
+              <label>
+                <span>이름</span>
+                <input id="alternateStudentName" type="text" placeholder="홍길동" required>
+              </label>
+              <label>
+                <span>학번</span>
+                <input id="alternateStudentNo" type="text" placeholder="20260001" required>
+              </label>
+              <label>
+                <span>지도교수</span>
+                <select id="alternateProfessorId" required></select>
+              </label>
+              <label>
+                <span>휴대폰 번호</span>
+                <input id="alternateStudentPhone" type="tel" placeholder="010-1234-5678" required>
+              </label>
+              <label>
+                <span>상담 회차</span>
+                <select id="alternatePhase" required>
+                  <option value="1">1차 면담</option>
+                  <option value="2">2차 면담</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              <span>가능한 시간대</span>
+              <textarea id="alternatePreferredTimeText" rows="3" placeholder="예: 화/목 18:00 이후, 토요일 오전 가능" required></textarea>
+            </label>
+            <label>
+              <span>사유</span>
+              <textarea id="alternateReason" rows="3" placeholder="기존 시간 참석이 어려운 사유를 적어주세요."></textarea>
+            </label>
+            <button class="secondary-btn" type="submit">대체 면담 요청 보내기</button>
+            <div id="alternateRequestMessage" class="inline-message"></div>
+          </form>
+
+          <form id="openCounselRequestForm" class="booking-form alternate-form">
+            <div class="form-title-row">
+              <div>
+                <p class="section-kicker">수시면담 신청</p>
+                <h3>정규 전화면담 외 별도 상담 요청</h3>
+              </div>
+              <strong>원하는 시간과 상담 주제를 남겨주세요.</strong>
+            </div>
+            <div class="field-grid">
+              <label>
+                <span>이름</span>
+                <input id="openCounselStudentName" type="text" placeholder="홍길동" required>
+              </label>
+              <label>
+                <span>학번</span>
+                <input id="openCounselStudentNo" type="text" placeholder="20260001" required>
+              </label>
+              <label>
+                <span>지도교수</span>
+                <select id="openCounselProfessorId" required></select>
+              </label>
+              <label>
+                <span>휴대폰 번호</span>
+                <input id="openCounselStudentPhone" type="tel" placeholder="010-1234-5678" required>
+              </label>
+              <label>
+                <span>상담 주제</span>
+                <input id="openCounselTopic" type="text" placeholder="학습, 출석, 진로 등" required>
+              </label>
+            </div>
+            <label>
+              <span>가능한 시간대</span>
+              <textarea id="openCounselPreferredTimeText" rows="3" placeholder="예: 평일 오후 6시 이후, 금요일 오전 가능" required></textarea>
+            </label>
+            <label>
+              <span>상담 요청 내용</span>
+              <textarea id="openCounselReason" rows="3" placeholder="상담 요청 배경이나 내용을 적어주세요."></textarea>
+            </label>
+            <button class="secondary-btn" type="submit">수시면담 신청 보내기</button>
+            <div id="openCounselRequestMessage" class="inline-message"></div>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">학생 조회</p>
+              <h2>내 예약 확인</h2>
+            </div>
+          </div>
+          <form id="lookupForm" class="stack-form">
+            <label>
+              <span>이름</span>
+              <input id="lookupName" type="text" placeholder="홍길동" required>
+            </label>
+            <label>
+              <span>학번</span>
+              <input id="lookupStudentNo" type="text" placeholder="20260001" required>
+            </label>
+            <label>
+              <span>휴대폰 뒷자리</span>
+              <input id="lookupPhoneLast4" type="text" maxlength="4" placeholder="5678" required>
+            </label>
+            <button class="secondary-btn" type="submit">예약 상태 확인</button>
+          </form>
+          <div id="lookupResults" class="lookup-results"></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">운영자 화면</p>
+              <h2>시스템 관리자 / 지도교수</h2>
+            </div>
+          </div>
+
+          <form id="systemLoginForm" class="stack-form admin-gate">
+            <label>
+              <span>시스템 관리자 코드</span>
+              <input id="systemAdminCode" type="password" placeholder="시스템 관리자 코드 입력">
+            </label>
+            <button class="secondary-btn" type="submit">시스템 관리 열기</button>
+            <div id="systemAuthMessage" class="inline-message"></div>
+          </form>
+
+          <div id="systemPanel" class="admin-panel hidden">
+            <form id="configForm" class="stack-form">
+              <h3>학기 설정</h3>
+              <div class="field-grid">
+                <label>
+                  <span>학기명</span>
+                  <input id="configSemesterLabel" type="text" required>
+                </label>
+                <label>
+                  <span>개강일</span>
+                  <input id="configSemesterStartDate" type="date" required>
+                </label>
+                <label>
+                  <span>중간고사 시작일</span>
+                  <input id="configMidtermDate" type="date" required>
+                </label>
+                <label>
+                  <span>기말고사 시작일</span>
+                  <input id="configFinalDate" type="date" required>
+                </label>
+                <label>
+                  <span>1차 집중면담 시작일</span>
+                  <input id="configFirstRoundFocusStartDate" type="date" required>
+                </label>
+                <label>
+                  <span>1차 집중면담 종료일</span>
+                  <input id="configFirstRoundFocusEndDate" type="date" required>
+                </label>
+                <label>
+                  <span>2차 집중면담 시작일</span>
+                  <input id="configSecondRoundFocusStartDate" type="date" required>
+                </label>
+                <label>
+                  <span>2차 집중면담 종료일</span>
+                  <input id="configSecondRoundFocusEndDate" type="date" required>
+                </label>
+              </div>
+              <label>
+                <span>학생 안내 문구</span>
+                <textarea id="configSupportMessage" rows="2" required></textarea>
+              </label>
+              <p class="helper-text">집중면담기간은 회차별로 약 2주를 기준으로 운영합니다. 시작일을 선택하면 종료일이 14일 범위로 자동 입력됩니다.</p>
+              <button class="primary-btn" type="submit">학기 설정 저장</button>
+            </form>
+
+            <form id="professorDirectoryForm" class="stack-form">
+              <h3>지도교수 목록 관리</h3>
+              <label>
+                <span>교수 목록 붙여넣기</span>
+                <textarea id="professorDirectoryInput" rows="6" placeholder="prof-1,김교수,010-1111-1111,국문학과,1111&#10;prof-2,박교수,010-2222-2222,경영학과,2222"></textarea>
+              </label>
+              <p class="helper-text">형식: 교수ID, 이름, 전화번호, 학과/부서, 로그인코드</p>
+              <button class="primary-btn" type="submit">지도교수 목록 저장</button>
+              <div id="professorDirectoryMessage" class="inline-message"></div>
+            </form>
+
+            <form id="rosterForm" class="stack-form">
+              <h3>학생 명단 관리</h3>
+              <label>
+                <span>학생 명단 붙여넣기</span>
+                <textarea id="rosterInput" rows="6" placeholder="20260001 홍길동&#10;20260002 김영희&#10;20260003 박민수"></textarea>
+              </label>
+              <div class="action-row">
+                <button class="primary-btn" type="submit">학생 명단 저장</button>
+                <span id="rosterMessage" class="inline-message"></span>
+              </div>
+            </form>
+          </div>
+
+          <form id="adminLoginForm" class="stack-form admin-gate">
+            <label>
+              <span>지도교수 선택</span>
+              <select id="adminProfessorSelect" required></select>
+            </label>
+            <label>
+              <span>지도교수 코드</span>
+              <input id="adminCode" type="password" placeholder="지도교수 코드 입력" required>
+            </label>
+            <button class="secondary-btn" type="submit">교수 화면 열기</button>
+            <div id="adminAuthMessage" class="inline-message"></div>
+          </form>
+
+          <div id="adminPanel" class="admin-panel hidden">
+            <form id="availabilityForm" class="stack-form">
+              <h3>면담 가능 시간 등록</h3>
+              <div class="field-grid">
+                <label>
+                  <span>날짜</span>
+                  <input id="availabilityDate" type="date" required>
+                </label>
+                <label>
+                  <span>시작 시간</span>
+                  <input id="availabilityStartTime" type="time" step="600" required>
+                </label>
+                <label>
+                  <span>종료 시간</span>
+                  <input id="availabilityEndTime" type="time" step="600" required>
+                </label>
+              </div>
+              <button class="primary-btn" type="submit">10분 단위 슬롯 생성</button>
+              <div id="availabilityMessage" class="inline-message"></div>
+            </form>
+
+            <section class="stack-form reminder-panel">
+              <div class="section-head">
+                <div>
+                  <p class="section-kicker">카카오톡 독려</p>
+                  <h3>미신청 학생 자동 관리</h3>
+                </div>
+                <div class="phase-legend">
+                  <button class="phase-chip active" type="button" data-reminder-phase="1">1차 면담</button>
+                  <button class="phase-chip" type="button" data-reminder-phase="2">2차 면담</button>
+                </div>
+              </div>
+              <div class="reminder-toolbar">
+                <div class="summary-card compact">
+                  <span id="missingCountLabel">미신청 학생 0명</span>
+                  <strong id="missingPhaseLabel">1차 면담</strong>
+                </div>
+                <div class="action-row">
+                  <button id="copyBroadcastBtn" class="secondary-btn" type="button">전체 독려 메시지 복사</button>
+                  <button id="copySelectedBtn" class="ghost-btn" type="button">개인별 메시지 복사</button>
+                </div>
+              </div>
+              <div id="missingStudentList" class="student-checklist"></div>
+              <div id="reminderMessage" class="inline-message"></div>
+            </section>
+
+            <div class="admin-columns">
+              <div>
+                <h3>승인 대기 예약</h3>
+                <div id="pendingReservations" class="reservation-cards"></div>
+                <div class="call-manager">
+                  <h3>대체 면담 요청</h3>
+                  <div id="alternateRequestList" class="reservation-cards"></div>
+                </div>
+                <div class="call-manager">
+                  <h3>수시면담 신청</h3>
+                  <div id="openCounselRequestList" class="reservation-cards"></div>
+                </div>
+              </div>
+              <div>
+                <h3>확정 일정 캘린더</h3>
+                <label class="month-picker">
+                  <span>표시 월</span>
+                  <input id="calendarMonth" type="month">
+                </label>
+                <div id="calendarGrid" class="calendar-grid"></div>
+                <div class="call-manager">
+                  <h3>전화 통화 관리</h3>
+                  <div id="callManagementList" class="reservation-cards"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./env.js"></script>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
