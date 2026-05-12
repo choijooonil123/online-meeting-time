@@ -116,6 +116,14 @@ function setInlineMessage(element, text, isError = false) {
   element.style.color = isError ? "var(--danger)" : "var(--muted)";
 }
 
+function showPanel(panelElement) {
+  if (!panelElement) {
+    return;
+  }
+  panelElement.classList.remove("hidden");
+  panelElement.style.display = "block";
+}
+
 function setBookingSuccess(lookupUrl) {
   els.bookingMessage.style.color = "var(--muted)";
   els.bookingMessage.innerHTML = `예약 신청이 접수되었습니다. 예약 확인 주소: <a href="${lookupUrl}">${lookupUrl}</a>`;
@@ -811,7 +819,7 @@ async function unlockAdminPanel() {
   if (!state.adminProfessorId) {
     throw new Error("지도교수를 선택해주세요.");
   }
-  els.adminPanel.classList.remove("hidden");
+  showPanel(els.adminPanel);
   sessionStorage.setItem("omtAdminCode", state.adminCode);
   sessionStorage.setItem("omtAdminProfessorId", state.adminProfessorId);
   setInlineMessage(els.adminAuthMessage, "관리자 인증이 완료되었습니다.");
@@ -821,8 +829,9 @@ async function unlockAdminPanel() {
 
 async function unlockSystemPanel() {
   const bootstrapConfig = state.functions.httpsCallable("bootstrapConfig");
+  setInlineMessage(els.systemAuthMessage, "시스템 관리자 인증 중입니다. 잠시 기다려 주세요.");
   await bootstrapConfig({adminCode: state.systemAdminCode});
-  els.systemPanel.classList.remove("hidden");
+  showPanel(els.systemPanel);
   sessionStorage.setItem("omtSystemAdminCode", state.systemAdminCode);
   setInlineMessage(els.systemAuthMessage, "시스템 관리자 인증이 완료되었습니다.");
   await loadSystemDashboard();
@@ -849,6 +858,7 @@ async function handleProfessorLoginSubmit(event) {
   state.adminProfessorId = els.adminProfessorSelect.value;
   state.adminCode = els.adminCode.value.trim();
   try {
+    setInlineMessage(els.adminAuthMessage, "지도교수 인증 중입니다. 잠시 기다려 주세요.");
     await unlockAdminPanel();
   } catch (error) {
     setInlineMessage(els.adminAuthMessage, error.message, true);
