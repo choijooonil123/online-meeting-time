@@ -495,6 +495,23 @@ textarea {
   margin: 14px 0;
 }
 
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 10px;
+}
+
+.calendar-weekdays span {
+  padding: 10px 0;
+  text-align: center;
+  border-radius: 999px;
+  background: rgba(47, 82, 61, 0.08);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
 .call-manager {
   margin-top: 22px;
 }
@@ -506,29 +523,91 @@ textarea {
 }
 
 .calendar-cell {
-  min-height: 132px;
-  padding: 12px;
+  min-height: 152px;
+  padding: 14px;
   border-radius: 18px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.68);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 252, 246, 0.88) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .calendar-cell.is-empty {
-  background: rgba(255, 255, 255, 0.36);
+  background: rgba(255, 255, 255, 0.28);
+  border-style: dashed;
 }
 
-.calendar-cell strong {
-  display: block;
-  margin-bottom: 8px;
+.calendar-cell.has-events {
+  border-color: rgba(47, 82, 61, 0.22);
+}
+
+.calendar-cell.is-today {
+  border-color: rgba(203, 98, 49, 0.5);
+  box-shadow:
+    0 0 0 2px rgba(203, 98, 49, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.calendar-date-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.calendar-date {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(47, 82, 61, 0.08);
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.calendar-cell.is-today .calendar-date {
+  background: var(--accent);
+  color: #fff;
+}
+
+.calendar-count {
+  min-height: 18px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .calendar-day-list {
+  display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
-.calendar-day-list span {
+.calendar-empty-text {
   font-size: 0.86rem;
   color: var(--muted);
+}
+
+.calendar-event {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(47, 82, 61, 0.08);
+}
+
+.calendar-event strong {
+  color: var(--accent);
+  font-size: 0.8rem;
+  line-height: 1.1;
+}
+
+.calendar-event span {
+  color: var(--ink);
+  font-size: 0.84rem;
+  line-height: 1.3;
 }
 
 .hidden {
@@ -565,6 +644,11 @@ textarea {
   .field-grid,
   .calendar-grid {
     grid-template-columns: 1fr;
+  }
+
+  .calendar-weekdays {
+    grid-template-columns: repeat(7, minmax(40px, 1fr));
+    overflow-x: auto;
   }
 
   .slot-day-head,

@@ -568,6 +568,12 @@ function renderCalendar() {
   }
 
   const [year, month] = monthValue.split("-").map(Number);
+  const todayKey = new Intl.DateTimeFormat("sv-SE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).format(new Date());
   const startWeekday = new Date(`${monthValue}-01T00:00:00+09:00`).getDay();
   const lastDate = new Date(Date.UTC(year, month, 0)).getUTCDate();
   const confirmed = state.adminReservations.filter((reservation) => {
@@ -599,13 +605,24 @@ function renderCalendar() {
 
   for (let day = 1; day <= lastDate; day += 1) {
     const dateKey = `${monthValue}-${String(day).padStart(2, "0")}`;
-    const items = (byDate[dateKey] || []).map((reservation) => `
-      <span>${formatTime(dateFromIso(reservation.startAt))} ${reservation.studentName}</span>
-    `).join("");
+    const items = (byDate[dateKey] || [])
+      .sort((a, b) => a.startAt.localeCompare(b.startAt))
+      .map((reservation) => `
+        <div class="calendar-event">
+          <strong>${formatTime(dateFromIso(reservation.startAt))}</strong>
+          <span>${reservation.studentName}</span>
+        </div>
+      `)
+      .join("");
+    const isToday = dateKey === todayKey ? " is-today" : "";
+    const hasItems = items ? " has-events" : "";
     cells.push(`
-      <div class="calendar-cell">
-        <strong>${day}</strong>
-        <div class="calendar-day-list">${items || "<span>확정 일정 없음</span>"}</div>
+      <div class="calendar-cell${isToday}${hasItems}">
+        <div class="calendar-date-row">
+          <strong class="calendar-date">${day}</strong>
+          <span class="calendar-count">${(byDate[dateKey] || []).length ? `${(byDate[dateKey] || []).length}건` : ""}</span>
+        </div>
+        <div class="calendar-day-list">${items || "<span class=\"calendar-empty-text\">확정 일정 없음</span>"}</div>
       </div>
     `);
   }
