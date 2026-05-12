@@ -1330,8 +1330,8 @@ async function start() {
     throw new Error("DATABASE_URL 환경변수가 필요합니다.");
   }
   await initializeSchema();
-  app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server listening on 0.0.0.0:${PORT}`);
   });
 }
 
