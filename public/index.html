@@ -212,7 +212,7 @@
             </div>
           </div>
 
-          <form id="systemLoginForm" class="stack-form admin-gate">
+          <form id="systemLoginForm" class="stack-form admin-gate" onsubmit="return window.__omtHandleSystemLogin ? window.__omtHandleSystemLogin(event) : false;">
             <label>
               <span>시스템 관리자 코드</span>
               <input id="systemAdminCode" type="password" placeholder="시스템 관리자 코드 입력">
@@ -290,7 +290,7 @@
             </form>
           </div>
 
-          <form id="adminLoginForm" class="stack-form admin-gate">
+          <form id="adminLoginForm" class="stack-form admin-gate" onsubmit="return window.__omtHandleProfessorLogin ? window.__omtHandleProfessorLogin(event) : false;">
             <label>
               <span>지도교수 선택</span>
               <select id="adminProfessorSelect" required></select>

@@ -829,6 +829,33 @@ async function unlockSystemPanel() {
   els.systemPanel.scrollIntoView({behavior: "smooth", block: "start"});
 }
 
+async function handleSystemLoginSubmit(event) {
+  if (event) {
+    event.preventDefault();
+  }
+  state.systemAdminCode = els.systemAdminCode.value.trim();
+  try {
+    await unlockSystemPanel();
+  } catch (error) {
+    setInlineMessage(els.systemAuthMessage, error.message, true);
+  }
+  return false;
+}
+
+async function handleProfessorLoginSubmit(event) {
+  if (event) {
+    event.preventDefault();
+  }
+  state.adminProfessorId = els.adminProfessorSelect.value;
+  state.adminCode = els.adminCode.value.trim();
+  try {
+    await unlockAdminPanel();
+  } catch (error) {
+    setInlineMessage(els.adminAuthMessage, error.message, true);
+  }
+  return false;
+}
+
 function getSelectedReminderStudents() {
   const missing = getMissingStudentsForPhase(state.reminderPhase);
   const selected = missing.filter((student) => state.selectedReminderStudentNos.has(student.studentNo));
@@ -1119,26 +1146,9 @@ function bindEvents() {
     }
   });
 
-  els.adminLoginForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    state.adminProfessorId = els.adminProfessorSelect.value;
-    state.adminCode = els.adminCode.value.trim();
-    try {
-      await unlockAdminPanel();
-    } catch (error) {
-      setInlineMessage(els.adminAuthMessage, error.message, true);
-    }
-  });
+  els.adminLoginForm.addEventListener("submit", handleProfessorLoginSubmit);
 
-  els.systemLoginForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    state.systemAdminCode = els.systemAdminCode.value.trim();
-    try {
-      await unlockSystemPanel();
-    } catch (error) {
-      setInlineMessage(els.systemAuthMessage, error.message, true);
-    }
-  });
+  els.systemLoginForm.addEventListener("submit", handleSystemLoginSubmit);
 
   els.configForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -1594,6 +1604,8 @@ async function initFirebase() {
 
 async function init() {
   cacheElements();
+  window.__omtHandleSystemLogin = handleSystemLoginSubmit;
+  window.__omtHandleProfessorLogin = handleProfessorLoginSubmit;
   bindEvents();
   if (els.professorDirectoryInput) {
     els.professorDirectoryInput.placeholder = "prof-1,김교수,010-1111-1111,국문학과,1111\nprof-2,박교수,010-2222-2222,경영학과,2222";
