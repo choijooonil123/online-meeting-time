@@ -2,6 +2,8 @@
 
 Firebase Hosting + Firestore + Cloud Functions 기반 전화면담 예약 시스템입니다.
 
+외부 백엔드 운영과 Firebase Hosting 프런트 분리 배포는 [DEPLOY_FIREBASE_RAILWAY.md](./DEPLOY_FIREBASE_RAILWAY.md)를 참고합니다.
+
 ## 포함 기능
 
 - 지도교수 상담 가능 시간을 등록하면 10분 단위 슬롯으로 자동 분할
