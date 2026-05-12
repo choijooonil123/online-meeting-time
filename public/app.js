@@ -35,7 +35,7 @@ const state = {
     supportMessage: "예약 확정 시 문자 알림이 발송됩니다.",
   },
   selectedSlotId: "",
-  selectedProfessorId: "",
+  selectedProfessorId: "prof-1",
   phaseFilter: "all",
   reminderPhase: "1",
   reminderPhaseInitialized: false,
@@ -141,11 +141,10 @@ function maskStudentName(name) {
 }
 
 function renderPhoneLink(phone, label = phone) {
-  const digits = normalizePhone(phone);
-  if (!digits) {
-    return label || "-";
+  if (!phone && !label) {
+    return "-";
   }
-  return `<a class="phone-link" href="tel:${digits}">${label || phone}</a>`;
+  return label || phone || "-";
 }
 
 function groupSlotsByDay(slots) {
@@ -170,16 +169,12 @@ function getSelectedProfessor() {
   return getActiveProfessors().find((professor) => professor.id === state.selectedProfessorId) || null;
 }
 
-function getProfessorBookingLink(professorId) {
-  const url = new URL(`${window.location.origin}${window.location.pathname}`);
-  if (professorId) {
-    url.searchParams.set("professorId", professorId);
-  }
-  return url.toString();
+function getDefaultProfessorId() {
+  return getActiveProfessors()[0]?.id || "prof-1";
 }
 
 function syncProfessorSelectValues() {
-  [els.publicProfessorSelect, els.bookingProfessorId, els.alternateProfessorId, els.openCounselProfessorId].forEach((element) => {
+  [els.bookingProfessorId, els.alternateProfessorId, els.openCounselProfessorId].forEach((element) => {
     if (element && state.selectedProfessorId) {
       element.value = state.selectedProfessorId;
     }
@@ -187,12 +182,7 @@ function syncProfessorSelectValues() {
 }
 
 function getVisibleSlots() {
-  return state.slots.filter((slot) => {
-    if (!state.selectedProfessorId) {
-      return true;
-    }
-    return slot.professorId === state.selectedProfessorId;
-  });
+  return state.slots;
 }
 
 function getMissingStudentsForPhase(phase) {
@@ -248,7 +238,6 @@ function renderProfessorOptions(selectElement, includePlaceholder = false) {
 }
 
 function populateProfessorSelects() {
-  renderProfessorOptions(els.publicProfessorSelect);
   renderProfessorOptions(els.bookingProfessorId);
   renderProfessorOptions(els.alternateProfessorId);
   renderProfessorOptions(els.openCounselProfessorId);
@@ -262,8 +251,8 @@ function populateProfessorSelects() {
 
   syncProfessorSelectValues();
 
-  if (state.adminProfessorId && els.adminProfessorSelect) {
-    els.adminProfessorSelect.value = state.adminProfessorId;
+  if (els.adminProfessorSelect) {
+    els.adminProfessorSelect.value = state.adminProfessorId || state.selectedProfessorId;
   }
 }
 
@@ -497,7 +486,7 @@ function renderAlternateRequestList() {
     const actionButtons = request.status === "requested"
       ? `
           <div class="reservation-actions">
-            <a class="secondary-btn phone-link" href="tel:${normalizePhone(request.phone)}">학생에게 전화걸기</a>
+            <span class="helper-text">학생 연락처: ${renderPhoneLink(request.phone, request.phone)}</span>
             <button class="ghost-btn" type="button" data-alt-review-id="${request.id}" data-alt-decision="handled">조율 완료</button>
             <button class="danger-btn" type="button" data-alt-review-id="${request.id}" data-alt-decision="cancelled">취소</button>
           </div>
@@ -536,7 +525,7 @@ function renderOpenCounselRequestList() {
     const actionButtons = request.status === "requested"
       ? `
           <div class="reservation-actions">
-            <a class="secondary-btn phone-link" href="tel:${normalizePhone(request.phone)}">학생에게 전화걸기</a>
+            <span class="helper-text">학생 연락처: ${renderPhoneLink(request.phone, request.phone)}</span>
             <button class="ghost-btn" type="button" data-open-review-id="${request.id}" data-open-decision="handled">조율 완료</button>
             <button class="danger-btn" type="button" data-open-review-id="${request.id}" data-open-decision="cancelled">취소</button>
           </div>
@@ -644,7 +633,7 @@ function renderCallManagementList() {
     const actions = reservation.status === "approved"
       ? `
           <div class="reservation-actions">
-            <a class="secondary-btn phone-link" href="tel:${normalizePhone(reservation.phone)}">학생에게 전화걸기</a>
+            <span class="helper-text">학생 연락처: ${renderPhoneLink(reservation.phone, reservation.phone)}</span>
             <button class="danger-btn" type="button" data-call-no-answer="${reservation.id}">통화불가 처리</button>
           </div>
         `
@@ -1417,7 +1406,7 @@ function renderProfessorOptions(selectElement, includePlaceholder = false) {
 
 function buildBroadcastMessage(students) {
   const professor = getSelectedProfessor();
-  const link = getProfessorBookingLink(professor?.id || state.adminProfessorId);
+  const link = `${window.location.origin}/`;
   const names = students.map((student) => maskStudentName(student.studentName)).join(", ");
   const professorLine = professor ? `${professor.name} 지도교수 담당 학생 안내` : "전화면담 신청 안내";
   return `[${getPhaseLabel(state.reminderPhase)} 미신청 학생 안내]
@@ -1432,7 +1421,7 @@ ${link}`;
 
 function buildPersonalMessage(student) {
   const professor = getSelectedProfessor();
-  const link = getProfessorBookingLink(professor?.id || state.adminProfessorId);
+  const link = `${window.location.origin}/`;
   const professorName = professor?.name || "지도교수";
   return `${student.studentName} 학생,
 ${professorName} 교수님 ${getPhaseLabel(state.reminderPhase)} 전화면담 신청이 아직 완료되지 않았습니다.
@@ -1518,6 +1507,149 @@ function fillRosterForm() {
       return `${student.studentNo},${student.studentName}`;
     })
     .join("\n");
+}
+
+function buildBroadcastMessage(students) {
+  const professor = getSelectedProfessor();
+  const link = `${window.location.origin}/`;
+  const names = students.map((student) => maskStudentName(student.studentName)).join(", ");
+  const professorLine = professor ? `${professor.name} 지도교수 담당 학생 안내` : "전화면담 신청 안내";
+  return `[${getPhaseLabel(state.reminderPhase)} 미신청 학생 안내]
+
+${professorLine}
+아래 학생의 전화면담 신청이 아직 완료되지 않았습니다.
+${names}
+
+아래 링크에서 예약해 주세요.
+${link}`;
+}
+
+function buildPersonalMessage(student) {
+  const professor = getSelectedProfessor();
+  const link = `${window.location.origin}/`;
+  const professorName = professor?.name || "지도교수";
+  return `${student.studentName} 학생,
+${professorName} 교수님 ${getPhaseLabel(state.reminderPhase)} 전화면담 신청이 아직 완료되지 않았습니다.
+
+아래 링크에서 예약해 주세요.
+${link}`;
+}
+
+function parseRosterInput(text) {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (!lines.length) {
+    throw new Error("등록할 학생 명단이 없습니다.");
+  }
+
+  const defaultProfessorId = getActiveProfessors()[0]?.id || "prof-1";
+
+  return lines.map((line, index) => {
+    const parts = line.split(/[\t,]+|\s{2,}|\s/).filter(Boolean);
+    if (parts.length < 2) {
+      throw new Error(`${index + 1}번째 줄 형식이 올바르지 않습니다. "학번 이름" 또는 "학번,이름" 형식으로 입력해 주세요.`);
+    }
+
+    const studentNo = parts[0];
+    if (!/^\d+$/.test(studentNo)) {
+      throw new Error(`${index + 1}번째 줄 학번 형식이 올바르지 않습니다.`);
+    }
+
+    const studentName = parts.slice(1).join(" ").trim();
+    if (!studentName) {
+      throw new Error(`${index + 1}번째 줄 학생 이름이 비어 있습니다.`);
+    }
+
+    return {
+      studentNo,
+      studentName,
+      professorId: defaultProfessorId,
+    };
+  });
+}
+
+function fillProfessorDirectoryForm() {
+  if (!els.professorDirectoryInput) {
+    return;
+  }
+  const professor = getActiveProfessors()[0];
+  els.professorDirectoryInput.value = professor ?
+    `${professor.id},${professor.name},${professor.phone},${professor.departmentName},` :
+    "prof-1,김교수,010-0000-0000,학과,";
+  if (els.professorDirectoryMessage && !els.professorDirectoryMessage.textContent) {
+    setInlineMessage(els.professorDirectoryMessage, "지도교수는 한 명만 등록합니다. 코드 칸을 비우면 현재 코드를 유지합니다.");
+  }
+}
+
+function fillRosterForm() {
+  if (!els.rosterInput) {
+    return;
+  }
+  els.rosterInput.value = state.studentRoster
+    .map((student) => `${student.studentNo},${student.studentName}`)
+    .join("\n");
+}
+
+async function loadAdminDashboard() {
+  const getProfessorDashboard = state.functions.httpsCallable("getProfessorDashboard");
+  state.adminProfessorId = getDefaultProfessorId();
+  const response = await getProfessorDashboard({
+    adminCode: state.adminCode,
+    professorId: state.adminProfessorId,
+  });
+  state.config = {...state.config, ...response.data.config};
+  state.professors = Array.isArray(state.config.professors) ? state.config.professors : [];
+  state.selectedProfessorId = state.adminProfessorId;
+  state.adminReservations = response.data.reservations;
+  state.alternateRequests = response.data.alternateRequests || [];
+  state.openCounselRequests = response.data.openCounselRequests || [];
+  state.studentRoster = response.data.studentRoster || [];
+  state.slots = response.data.slots || [];
+  if (!state.reminderPhaseInitialized) {
+    state.reminderPhase = inferReminderPhase();
+    state.reminderPhaseInitialized = true;
+  }
+  populateProfessorSelects();
+  updateHero();
+  renderSummary();
+  renderSlots();
+  renderPendingReservations();
+  renderAlternateRequestList();
+  renderOpenCounselRequestList();
+  renderReminderPanel();
+  renderCalendar();
+  renderCallManagementList();
+  document.querySelectorAll("[data-reminder-phase]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.reminderPhase === state.reminderPhase);
+  });
+}
+
+async function unlockAdminPanel() {
+  state.adminProfessorId = getDefaultProfessorId();
+  showPanel(els.adminPanel);
+  sessionStorage.setItem("omtAdminCode", state.adminCode);
+  sessionStorage.setItem("omtAdminProfessorId", state.adminProfessorId);
+  setInlineMessage(els.adminAuthMessage, "관리자 인증이 완료되었습니다.");
+  await loadAdminDashboard();
+  els.adminPanel.scrollIntoView({behavior: "smooth", block: "start"});
+}
+
+async function handleProfessorLoginSubmit(event) {
+  if (event) {
+    event.preventDefault();
+  }
+  state.adminProfessorId = getDefaultProfessorId();
+  state.adminCode = els.adminCode.value.trim();
+  try {
+    setInlineMessage(els.adminAuthMessage, "지도교수 인증 중입니다. 잠시 기다려 주세요.");
+    await unlockAdminPanel();
+  } catch (error) {
+    setInlineMessage(els.adminAuthMessage, error.message, true);
+  }
+  return false;
 }
 
 function getApiBaseUrl() {

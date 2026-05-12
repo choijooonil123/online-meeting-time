@@ -860,7 +860,6 @@ async function createReservation(data) {
 
   const lookupUrl = new URL(baseLookupUrl);
   lookupUrl.searchParams.set("studentNo", studentNo);
-  lookupUrl.searchParams.set("professorId", createdProfessorId);
 
   return {
     ok: true,
@@ -1233,6 +1232,93 @@ async function getPublicSlots() {
     FROM availability_slots
     ORDER BY start_at ASC
   `);
+  return rows.map(serializeSlot);
+}
+
+function getPrimaryProfessor(config) {
+  const professors = Array.isArray(config && config.professors) ? config.professors.filter(Boolean) : [];
+  const firstProfessor = professors[0] || DEFAULT_PUBLIC_CONFIG.professors[0];
+  return {
+    ...DEFAULT_PUBLIC_CONFIG.professors[0],
+    ...firstProfessor,
+    id: "prof-1",
+    active: true,
+  };
+}
+
+function sanitizeProfessorDirectory(entries, existingCodes = {}) {
+  if (!Array.isArray(entries) || !entries.length) {
+    throw new AppError(400, "invalid-argument", "지도교수 정보가 비어 있습니다.");
+  }
+  if (entries.length > 1) {
+    throw new AppError(400, "invalid-argument", "지도교수는 한 명만 등록할 수 있습니다.");
+  }
+
+  const entry = entries[0];
+  const id = "prof-1";
+  const name = ensureString(entry.name, "entries[0].name");
+  const phone = ensureString(entry.phone, "entries[0].phone");
+  const departmentName = ensureString(entry.departmentName, "entries[0].departmentName");
+  const submittedCode = String(entry.adminCode || "").trim();
+  const adminCode = submittedCode || existingCodes[id];
+
+  if (!adminCode) {
+    throw new AppError(400, "invalid-argument", "지도교수 로그인 코드가 비어 있습니다.");
+  }
+
+  return {
+    publicProfessors: [{id, name, phone, departmentName, active: true}],
+    professorAdminCodes: {[id]: adminCode},
+  };
+}
+
+function sanitizeRosterEntries(entries, config) {
+  if (!Array.isArray(entries)) {
+    throw new AppError(400, "invalid-argument", "학생 명단 형식이 올바르지 않습니다.");
+  }
+
+  const defaultProfessorId = getPrimaryProfessor(config).id;
+  const seen = new Set();
+
+  return entries.map((entry, index) => {
+    const studentNo = ensureString(entry.studentNo, `entries[${index}].studentNo`);
+    const studentName = ensureString(entry.studentName, `entries[${index}].studentName`);
+    const phone = String(entry.phone || "").trim();
+
+    if (seen.has(studentNo)) {
+      throw new AppError(409, "already-exists", `중복 학번이 있습니다: ${studentNo}`);
+    }
+    seen.add(studentNo);
+
+    return {studentNo, studentName, phone, professorId: defaultProfessorId};
+  });
+}
+
+function filterStudentRosterForProfessor(studentRoster, professorId, config) {
+  return studentRoster;
+}
+
+async function getPublicConfig(client = pool) {
+  const data = await getConfigValue("publicConfig", client);
+  if (!data) {
+    return {...DEFAULT_PUBLIC_CONFIG};
+  }
+
+  return {
+    ...data,
+    professors: [getPrimaryProfessor(data)],
+  };
+}
+
+async function getPublicSlots() {
+  const config = await getPublicConfig();
+  const primaryProfessorId = getPrimaryProfessor(config).id;
+  const {rows} = await pool.query(`
+    SELECT *
+    FROM availability_slots
+    WHERE professor_id = $1
+    ORDER BY start_at ASC
+  `, [primaryProfessorId]);
   return rows.map(serializeSlot);
 }
 

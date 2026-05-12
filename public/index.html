@@ -44,11 +44,7 @@
             </div>
           </div>
 
-          <label>
-            <span>지도교수 선택</span>
-            <select id="publicProfessorSelect"></select>
-          </label>
-
+          <select id="publicProfessorSelect" hidden aria-hidden="true"></select>
           <div id="slotSummary" class="summary-row"></div>
           <div id="slotList" class="slot-list"></div>
 
@@ -61,6 +57,7 @@
               <strong id="selectedSlotLabel">상담 시간을 선택하세요.</strong>
             </div>
             <input type="hidden" id="selectedSlotId">
+            <select id="bookingProfessorId" hidden aria-hidden="true"></select>
             <div class="field-grid">
               <label>
                 <span>이름</span>
@@ -69,10 +66,6 @@
               <label>
                 <span>학번</span>
                 <input id="studentNo" name="studentNo" type="text" placeholder="20260001" required>
-              </label>
-              <label>
-                <span>지도교수</span>
-                <select id="bookingProfessorId" required></select>
               </label>
               <label>
                 <span>휴대폰 번호</span>
@@ -109,10 +102,6 @@
                 <input id="alternateStudentNo" type="text" placeholder="20260001" required>
               </label>
               <label>
-                <span>지도교수</span>
-                <select id="alternateProfessorId" required></select>
-              </label>
-              <label>
                 <span>휴대폰 번호</span>
                 <input id="alternateStudentPhone" type="tel" placeholder="010-1234-5678" required>
               </label>
@@ -124,6 +113,7 @@
                 </select>
               </label>
             </div>
+            <select id="alternateProfessorId" hidden aria-hidden="true"></select>
             <label>
               <span>가능한 시간대</span>
               <textarea id="alternatePreferredTimeText" rows="3" placeholder="예: 화/목 18:00 이후, 토요일 오전 가능" required></textarea>
@@ -154,10 +144,6 @@
                 <input id="openCounselStudentNo" type="text" placeholder="20260001" required>
               </label>
               <label>
-                <span>지도교수</span>
-                <select id="openCounselProfessorId" required></select>
-              </label>
-              <label>
                 <span>휴대폰 번호</span>
                 <input id="openCounselStudentPhone" type="tel" placeholder="010-1234-5678" required>
               </label>
@@ -166,6 +152,7 @@
                 <input id="openCounselTopic" type="text" placeholder="학습, 출석, 진로 등" required>
               </label>
             </div>
+            <select id="openCounselProfessorId" hidden aria-hidden="true"></select>
             <label>
               <span>가능한 시간대</span>
               <textarea id="openCounselPreferredTimeText" rows="3" placeholder="예: 평일 오후 6시 이후, 금요일 오전 가능" required></textarea>
@@ -267,13 +254,13 @@
             </form>
 
             <form id="professorDirectoryForm" class="stack-form">
-              <h3>지도교수 목록 관리</h3>
+              <h3>지도교수 정보 관리</h3>
               <label>
-                <span>교수 목록 붙여넣기</span>
-                <textarea id="professorDirectoryInput" rows="6" placeholder="prof-1,김교수,010-1111-1111,국문학과,1111&#10;prof-2,박교수,010-2222-2222,경영학과,2222"></textarea>
+                <span>지도교수 정보 입력</span>
+                <textarea id="professorDirectoryInput" rows="3" placeholder="prof-1,김교수,010-1111-1111,국문학과,1111"></textarea>
               </label>
-              <p class="helper-text">형식: 교수ID, 이름, 전화번호, 학과/부서, 로그인코드</p>
-              <button class="primary-btn" type="submit">지도교수 목록 저장</button>
+              <p class="helper-text">형식: 교수ID, 이름, 전화번호, 학과/부서, 로그인코드. 한 명만 등록합니다.</p>
+              <button class="primary-btn" type="submit">지도교수 정보 저장</button>
               <div id="professorDirectoryMessage" class="inline-message"></div>
             </form>
 
@@ -291,10 +278,7 @@
           </div>
 
           <form id="adminLoginForm" class="stack-form admin-gate" onsubmit="return window.__omtHandleProfessorLogin ? window.__omtHandleProfessorLogin(event) : false;">
-            <label>
-              <span>지도교수 선택</span>
-              <select id="adminProfessorSelect" required></select>
-            </label>
+            <select id="adminProfessorSelect" hidden aria-hidden="true"></select>
             <label>
               <span>지도교수 코드</span>
               <input id="adminCode" type="password" placeholder="지도교수 코드 입력" required>
