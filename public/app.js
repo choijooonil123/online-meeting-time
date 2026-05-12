@@ -816,6 +816,7 @@ async function unlockAdminPanel() {
   sessionStorage.setItem("omtAdminProfessorId", state.adminProfessorId);
   setInlineMessage(els.adminAuthMessage, "관리자 인증이 완료되었습니다.");
   await loadAdminDashboard();
+  els.adminPanel.scrollIntoView({behavior: "smooth", block: "start"});
 }
 
 async function unlockSystemPanel() {
@@ -825,6 +826,7 @@ async function unlockSystemPanel() {
   sessionStorage.setItem("omtSystemAdminCode", state.systemAdminCode);
   setInlineMessage(els.systemAuthMessage, "시스템 관리자 인증이 완료되었습니다.");
   await loadSystemDashboard();
+  els.systemPanel.scrollIntoView({behavior: "smooth", block: "start"});
 }
 
 function getSelectedReminderStudents() {
