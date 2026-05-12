@@ -427,6 +427,15 @@ async function initializeSchema() {
         "prof-1": DEFAULT_ADMIN_CODE,
       },
     });
+  } else {
+    await setConfigValue("privateConfig", {
+      ...privateConfig,
+      systemAdminCode: DEFAULT_ADMIN_CODE,
+      professorAdminCodes: {
+        "prof-1": (privateConfig.professorAdminCodes && privateConfig.professorAdminCodes["prof-1"]) || DEFAULT_ADMIN_CODE,
+        ...(privateConfig.professorAdminCodes || {}),
+      },
+    });
   }
 }
 
